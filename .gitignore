@@ -1,0 +1,8 @@
+# Workspace and test artifacts
+naver-openapi-helper-workspace/
+*.pyc
+__pycache__/
+.DS_Store
+
+# Skill package (build artifact)
+*.skill
