@@ -1,0 +1,23 @@
+{
+  "skill_name": "naver-openapi-helper",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate Python code to search Naver News for 'artificial intelligence', return top 20 results sorted by date, reading client ID and secret from environment variables.",
+      "expected_output": "A Python script using requests to call GET /v1/search/news.json with query='artificial intelligence', display=20, sort='date', auth headers from os.environ, and JSON response parsing.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Write a Python script that fetches Naver Datalab search trends for 'Python', 'JavaScript', and 'TypeScript' from Jan 2024 to Dec 2024, monthly granularity, and saves results to a JSON file.",
+      "expected_output": "A Python script using requests to POST /v1/datalab/search with keywordGroups for all three terms, timeUnit='month', startDate='2024-01-01', endDate='2024-12-31', Content-Type: application/json header, and saves the JSON response to a file.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Create Python code for Naver Blog search that searches for 'travel tips', returns 50 results, and includes a CLI with argparse so I can pass the query as a command-line argument.",
+      "expected_output": "A Python script with argparse CLI that calls GET /v1/search/blog.json with query from args, display=50, auth headers from os.environ, and prints results.",
+      "files": []
+    }
+  ]
+}

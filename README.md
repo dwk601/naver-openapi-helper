@@ -44,6 +44,16 @@ Write a Python script that fetches Naver Datalab search trends for 'Python' vs '
 - `npx @playwright/cli` (for live doc browsing)
 - Python `requests` library (for generated code)
 
+## API Scope Enablement
+
+Each Naver API requires separate enablement in the [Naver Developer Center](https://developers.naver.com/apps/#/list):
+
+- **Search APIs** (News, Blog, Web, Image, Book, etc.) → enable **"검색"**
+- **Datalab APIs** → enable **"데이터랩 (검색어트렌드)"**
+- **Shopping API** → enable **"쇼핑"**
+
+If you get `errorCode: "024"` (Scope Status Invalid), your key is valid but missing the specific API scope.
+
 ## License
 
 MIT
