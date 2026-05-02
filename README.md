@@ -1,5 +1,7 @@
 # Naver Open API Helper
 
+[![skills.sh](https://skills.sh/b/dwk601/naver-openapi-helper)](https://skills.sh/dwk601/naver-openapi-helper)
+
 A Claude skill for generating clean, production-ready Python `requests` code for Naver Open APIs.
 
 ## APIs Supported
@@ -26,6 +28,14 @@ When you ask for Naver API integration, this skill:
    - Optional `argparse` CLI interface
 
 ## Installation
+
+### Via skills.sh (Recommended)
+
+```bash
+npx skills add dwk601/naver-openapi-helper
+```
+
+### Manual
 
 Copy the `naver-openapi-helper` directory into your skills directory (e.g., `~/.agents/skills/` or `~/.claude/skills/`).
 
