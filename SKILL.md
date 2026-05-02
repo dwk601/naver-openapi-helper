@@ -34,6 +34,16 @@ If the user provides explicit credentials, use them but add a comment warning:
 # WARNING: Hardcoding credentials is insecure. Use environment variables in production.
 ```
 
+## Important: API Scope Enablement
+
+Each Naver API family must be enabled separately in the [Naver Developer Center](https://developers.naver.com/apps/#/list):
+
+- **Search APIs** → enable **"검색"**
+- **Datalab APIs** → enable **"데이터랩 (검색어트렌드)"**
+- **Shopping API** → enable **"쇼핑"**
+
+If you get `errorCode: "024"` (Scope Status Invalid), your key is valid but the specific API is not enabled. Go to your app's API Settings and check the relevant box.
+
 ## Workflow
 
 ### Step 1: Identify the API
@@ -131,6 +141,17 @@ def main():
     if response.status_code == 200:
         data = response.json()
         print(json.dumps(data, ensure_ascii=False, indent=2))
+    elif response.status_code == 400:
+        print(f"Error 400 - Bad Request: {response.text}")
+        print("Check your parameters (query encoding, display/start/sort values).")
+    elif response.status_code == 401:
+        print(f"Error 401 - Unauthorized: {response.text}")
+        print("Check your Client ID and Secret. Ensure the API scope is enabled in Naver Developer Center.")
+    elif response.status_code == 403:
+        print(f"Error 403 - Forbidden: {response.text}")
+        print("Ensure the API is enabled for your application in the Naver Developer Center.")
+    elif response.status_code == 500:
+        print(f"Error 500 - Internal Server Error: {response.text}")
     else:
         print(f"Error {response.status_code}: {response.text}")
 
@@ -143,7 +164,7 @@ if __name__ == "__main__":
 
 1. **Always use `requests`**, not `urllib`.
 2. **Always URL-encode Korean queries**. Use `urllib.parse.quote(query, safe='')` or let `requests` handle it via the `params` dict (which encodes automatically).
-3. **Always include error handling** for non-200 status codes, especially 400, 403, and 500.
+3. **Always include error handling** for non-200 status codes, especially 400, 401, 403, and 500.
 4. **Always load credentials from `os.environ`** unless the user explicitly provides them inline.
 5. **For Datalab (POST)**: Set `Content-Type: application/json` and pass the body via `json=body_dict`.
 6. **For Search APIs (GET)**: Pass query parameters via `params=`. `requests` will URL-encode them.
@@ -191,7 +212,6 @@ Before presenting the code to the user:
 
 - **Base URL is always `https://openapi.naver.com`** for Open APIs. Do not confuse with `https://api.searchad.naver.com` (Search Ad API).
 - **Daily rate limits**: Search APIs = 25,000 calls/day. Datalab = 1,000 calls/day.
-- **403 errors** usually mean the app isn't registered for that API in the Naver Developer Center.
 - **The live docs are the source of truth** — always browse them to confirm the latest parameter names and endpoints.
 - **Search API queries must be UTF-8 encoded.** `requests` does this automatically when you pass a string via `params`, but if building URLs manually, use `urllib.parse.quote`.
 

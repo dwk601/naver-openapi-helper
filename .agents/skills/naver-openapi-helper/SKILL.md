@@ -34,15 +34,15 @@ If the user provides explicit credentials, use them but add a comment warning:
 # WARNING: Hardcoding credentials is insecure. Use environment variables in production.
 ```
 
-## Critical: API Scope Enablement
+## Important: API Scope Enablement
 
-Each Naver API family requires **separate enablement** in the Naver Developer Center:
+Each Naver API family must be enabled separately in the [Naver Developer Center](https://developers.naver.com/apps/#/list):
 
-- **Search APIs** (News, Blog, Web, Image, Book, Cafe, etc.) require **"검색"** to be enabled
-- **Datalab APIs** require **"데이터랩 (검색어트렌드)"** to be enabled separately
-- **Shopping API** requires **"쇼핑"** to be enabled
+- **Search APIs** → enable **"검색"**
+- **Datalab APIs** → enable **"데이터랩 (검색어트렌드)"**
+- **Shopping API** → enable **"쇼핑"**
 
-If you get `errorCode: "024"` (Scope Status Invalid), your API key is valid but does **not** have permission for that specific API. You must go to [Naver Developer Center → Application → My Applications → API Settings](https://developers.naver.com/apps/#/list) and enable the specific API scope.
+If you get `errorCode: "024"` (Scope Status Invalid), your key is valid but the specific API is not enabled. Go to your app's API Settings and check the relevant box.
 
 ## Workflow
 
@@ -50,17 +50,17 @@ If you get `errorCode: "024"` (Scope Status Invalid), your API key is valid but 
 
 From the user's request, determine which API family they need:
 
-| User mentions | API | Docs URL | Required API Scope |
-|---|---|---|---|
-| "news", "article", "headline" | News Search | `https://developers.naver.com/docs/serviceapi/search/news/news.md` | 검색 |
-| "blog", "blog post" | Blog Search | `https://developers.naver.com/docs/serviceapi/search/blog/blog.md` | 검색 |
-| "web", "web document", "webkr" | Web Search | `https://developers.naver.com/docs/serviceapi/search/web/web.md` | 검색 |
-| "image", "picture", "photo" | Image Search | `https://developers.naver.com/docs/serviceapi/search/image/image.md` | 검색 |
-| "book", "책" | Book Search | `https://developers.naver.com/docs/serviceapi/search/book/book.md` | 검색 |
-| "datalab", "trend", "keyword trend", "search trend" | Datalab Search | `https://developers.naver.com/docs/serviceapi/datalab/search/search.md` | 데이터랩 (검색어트렌드) |
-| "shopping", "shop" | Shopping Search | `https://developers.naver.com/docs/serviceapi/search/shop/shop.md` | 쇼핑 |
-| "encyc", "encyclopedia", "knowledge" | Encyclopedia | `https://developers.naver.com/docs/serviceapi/search/encyc/encyc.md` | 검색 |
-| "cafe", "cafegroup" | Cafe Search | `https://developers.naver.com/docs/serviceapi/search/cafearticle/cafearticle.md` | 검색 |
+| User mentions | API | Docs URL |
+|---|---|---|
+| "news", "article", "headline" | News Search | `https://developers.naver.com/docs/serviceapi/search/news/news.md` |
+| "blog", "blog post" | Blog Search | `https://developers.naver.com/docs/serviceapi/search/blog/blog.md` |
+| "web", "web document", "webkr" | Web Search | `https://developers.naver.com/docs/serviceapi/search/web/web.md` |
+| "image", "picture", "photo" | Image Search | `https://developers.naver.com/docs/serviceapi/search/image/image.md` |
+| "book", "책" | Book Search | `https://developers.naver.com/docs/serviceapi/search/book/book.md` |
+| "datalab", "trend", "keyword trend", "search trend" | Datalab Search | `https://developers.naver.com/docs/serviceapi/datalab/search/search.md` |
+| "shopping", "shop" | Shopping Search | `https://developers.naver.com/docs/serviceapi/search/shop/shop.md` |
+| "encyc", "encyclopedia", "knowledge" | Encyclopedia | `https://developers.naver.com/docs/serviceapi/search/encyc/encyc.md` |
+| "cafe", "cafegroup" | Cafe Search | `https://developers.naver.com/docs/serviceapi/search/cafearticle/cafearticle.md` |
 
 If unsure, browse the Naver API docs index or ask the user.
 
@@ -141,22 +141,15 @@ def main():
     if response.status_code == 200:
         data = response.json()
         print(json.dumps(data, ensure_ascii=False, indent=2))
+    elif response.status_code == 400:
+        print(f"Error 400 - Bad Request: {response.text}")
+        print("Check your parameters (query encoding, display/start/sort values).")
     elif response.status_code == 401:
-        error_data = response.json()
-        error_code = error_data.get("errorCode", "")
-        if error_code == "024":
-            print(f"Error 401 - Scope Status Invalid (errorCode: 024)")
-            print("Your API key is valid but does not have permission for this API.")
-            print("Enable the API in Naver Developer Center → My Applications → API Settings.")
-            print("For Datalab: enable '데이터랩 (검색어트렌드)'")
-            print("For Search: enable '검색'")
-        else:
-            print(f"Error 401 - Unauthorized: {response.text}")
+        print(f"Error 401 - Unauthorized: {response.text}")
+        print("Check your Client ID and Secret. Ensure the API scope is enabled in Naver Developer Center.")
     elif response.status_code == 403:
         print(f"Error 403 - Forbidden: {response.text}")
         print("Ensure the API is enabled for your application in the Naver Developer Center.")
-    elif response.status_code == 400:
-        print(f"Error 400 - Bad Request: {response.text}")
     elif response.status_code == 500:
         print(f"Error 500 - Internal Server Error: {response.text}")
     else:
@@ -219,49 +212,8 @@ Before presenting the code to the user:
 
 - **Base URL is always `https://openapi.naver.com`** for Open APIs. Do not confuse with `https://api.searchad.naver.com` (Search Ad API).
 - **Daily rate limits**: Search APIs = 25,000 calls/day. Datalab = 1,000 calls/day.
-- **403 errors** usually mean the app isn't registered for that API in the Naver Developer Center.
-- **Error code `024` (Scope Status Invalid)** means your Naver application does not have the specific API scope enabled. Each API family (Search, Datalab, etc.) must be enabled separately in [Naver Developer Center → My Applications → API Settings](https://developers.naver.com/apps/#/list). If you get this error, go to your app's API Settings and enable the relevant API (e.g., "데이터랩 (검색어트렌드)" for Datalab).
 - **The live docs are the source of truth** — always browse them to confirm the latest parameter names and endpoints.
 - **Search API queries must be UTF-8 encoded.** `requests` does this automatically when you pass a string via `params`, but if building URLs manually, use `urllib.parse.quote`.
-
-### Diagnostic Helper
-
-If the user reports auth errors, generate a small diagnostic script they can run to verify which APIs their key supports:
-
-```python
-import os, requests
-
-def check_api(url, name, method="GET", body=None):
-    headers = {
-        "X-Naver-Client-Id": os.environ.get("NAVER_CLIENT_ID"),
-        "X-Naver-Client-Secret": os.environ.get("NAVER_CLIENT_SECRET"),
-    }
-    if body:
-        headers["Content-Type"] = "application/json"
-    try:
-        if method == "POST" and body:
-            r = requests.post(url, headers=headers, json=body, timeout=10)
-        else:
-            r = requests.get(url, headers=headers, timeout=10)
-        if r.status_code == 200:
-            print(f"✅ {name}: OK")
-        elif r.status_code == 401:
-            data = r.json()
-            if data.get("errorCode") == "024":
-                print(f"❌ {name}: Scope not enabled (error 024). Enable in Naver Developer Center.")
-            else:
-                print(f"❌ {name}: Auth failed - {data.get('errorMessage', r.text)}")
-        else:
-            print(f"⚠️  {name}: HTTP {r.status_code}")
-    except Exception as e:
-        print(f"⚠️  {name}: Error - {e}")
-
-check_api("https://openapi.naver.com/v1/search/news.json?query=test&display=1", "News Search")
-check_api("https://openapi.naver.com/v1/datalab/search", "Datalab Trends", "POST", {
-    "startDate": "2024-01-01", "endDate": "2024-01-31", "timeUnit": "month",
-    "keywordGroups": [{"groupName": "test", "keywords": ["test"]}]
-})
-```
 
 ## Examples
 
